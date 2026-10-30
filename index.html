@@ -1,0 +1,289 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Human Activity AI | Smart Recognition</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+:root{--bg:#080d19;--panel:#111b2d;--blue:#38bdf8;--purple:#a78bfa;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,Arial,sans-serif;background:var(--bg);color:#f8fafc;overflow-x:hidden}
+body:before{content:"";position:fixed;width:550px;height:550px;background:#2563eb20;filter:blur(120px);top:-200px;left:-180px;z-index:-1}
+body:after{content:"";position:fixed;width:500px;height:500px;background:#9333ea20;filter:blur(130px);bottom:-200px;right:-180px;z-index:-1}
+nav{height:76px;padding:0 7%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff12;background:#080d19cc;backdrop-filter:blur(20px);position:sticky;top:0;z-index:10}
+.logo{font-weight:900;font-size:20px;letter-spacing:-1px}
+.logo span{color:var(--blue)}
+.navright{display:flex;align-items:center;gap:9px;color:#cbd5e1;font-size:12px}
+.dot{width:8px;height:8px;background:#4ade80;border-radius:50%;box-shadow:0 0 12px #4ade80}
+.hero{text-align:center;padding:75px 20px 45px}
+.tag{display:inline-flex;gap:8px;align-items:center;border:1px solid #38bdf844;background:#38bdf810;padding:9px 16px;border-radius:30px;color:#7dd3fc;font-size:11px;font-weight:700;letter-spacing:1px}
+.hero h1{font-size:clamp(35px,6vw,65px);font-weight:900;letter-spacing:-3px;line-height:1.12;margin:24px auto 16px}
+.gradient{background:linear-gradient(90deg,#38bdf8,#a78bfa,#f0abfc);background-clip:text;-webkit-background-clip:text;color:transparent}
+.hero p{color:var(--muted);font-size:15px;line-height:1.8;max-width:600px;margin:auto}
+.container{max-width:1100px;padding:0 20px;margin:0 auto 65px}
+.workspace{display:grid;grid-template-columns:1.15fr .85fr;gap:22px}
+.panel{background:linear-gradient(145deg,#152238eF,#101827f5);border:1px solid #ffffff14;border-radius:22px;padding:26px;box-shadow:0 20px 70px #0003}
+.panelhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.panelhead h2{font-size:17px}
+.small{font-size:11px;color:#64748b}
+.tabs{display:flex;gap:8px;background:#080f1e;padding:5px;border-radius:12px;margin-bottom:20px}
+.tabs button{flex:1;background:transparent;color:#94a3b8;padding:12px 8px;border:0;border-radius:9px;cursor:pointer;font-weight:700;font-size:12px}
+.tabs button.active{background:#243954;color:#7dd3fc}
+.dropzone{border:1.5px dashed #45617f;border-radius:17px;min-height:245px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px;cursor:pointer;transition:.3s;background:#0b1424}
+.dropzone:hover,.dropzone.drag{border-color:#38bdf8;background:#38bdf80b;transform:translateY(-2px)}
+.uploadicon{width:65px;height:65px;border-radius:19px;background:linear-gradient(135deg,#0ea5e933,#8b5cf633);display:grid;place-items:center;font-size:30px;margin-bottom:17px}
+.dropzone h3{font-size:15px;margin-bottom:9px}
+.dropzone p{font-size:11px;color:#94a3b8;line-height:1.7}
+.browse{color:#38bdf8;font-weight:700}
+#imageInput{display:none}
+.previewwrap{display:none;margin-top:15px;position:relative}
+.previewwrap img{width:100%;height:230px;object-fit:contain;border-radius:13px;background:#080d19}
+.remove{position:absolute;right:10px;top:10px;background:#ef4444;border:0;border-radius:8px;color:white;padding:8px 11px;cursor:pointer}
+#video{display:none;width:100%;max-height:260px;background:#000;border-radius:13px;margin-top:12px}
+.cameraBtns{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.action{padding:12px 17px;border:1px solid #ffffff18;border-radius:10px;background:#243954;color:white;cursor:pointer;font-size:12px;font-weight:700}
+.action.primary{background:linear-gradient(100deg,#0284c7,#6366f1);border:0}
+.action:hover{filter:brightness(1.2)}
+.predict{width:100%;margin-top:20px;border:0;border-radius:13px;padding:17px;background:linear-gradient(100deg,#0284c7,#6366f1,#9333ea);color:white;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 9px 30px #2563eb35;transition:.25s}
+.predict:hover{transform:translateY(-2px);box-shadow:0 12px 35px #6366f155}
+.predict:disabled{opacity:.6;cursor:wait}
+.status{text-align:center;color:#94a3b8;font-size:11px;margin-top:14px;min-height:18px}
+.resultpanel{display:flex;flex-direction:column;justify-content:space-between}
+.resulttop{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
+.live{color:#4ade80;font-size:10px;font-weight:800;letter-spacing:1px}
+.resultbox{border:1px solid #38bdf833;background:radial-gradient(circle at 50% 0%,#2563eb22,transparent 65%),#0b1424;border-radius:18px;padding:28px 17px;text-align:center;min-height:240px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.resulticon{font-size:43px;margin-bottom:17px}
+.resultlabel{font-size:10px;letter-spacing:2px;color:#94a3b8;font-weight:700}
+#activity{font-size:clamp(23px,3vw,33px);font-weight:900;margin:12px 0;background:linear-gradient(90deg,#38bdf8,#c4b5fd);background-clip:text;-webkit-background-clip:text;color:transparent}
+#confidence{font-size:12px;color:#cbd5e1}
+.confbar{height:7px;background:#26364d;border-radius:20px;margin-top:19px;width:100%;overflow:hidden}
+#bar{height:100%;width:0;background:linear-gradient(90deg,#38bdf8,#a78bfa);border-radius:20px;transition:width 1s}
+.emptyhint{font-size:12px;color:#64748b;line-height:1.8;max-width:240px}
+.resultbottom{margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mini{background:#0b1424;border:1px solid #ffffff0c;border-radius:12px;padding:14px}
+.mini strong{display:block;font-size:16px;color:#7dd3fc;margin-bottom:5px}
+.mini span{font-size:10px;color:#94a3b8}
+.activities{margin-top:23px}
+.activities h2{font-size:16px;margin-bottom:15px}
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{font-size:11px;color:#cbd5e1;background:#1b2b42;border:1px solid #ffffff0c;padding:9px 13px;border-radius:30px}
+.info{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.infocard{padding:20px;background:#111b2d;border:1px solid #ffffff12;border-radius:16px}
+.infocard b{font-size:13px;display:block;margin:11px 0 7px}
+.infocard p{font-size:11px;color:#94a3b8;line-height:1.7}
+.infoicon{font-size:23px}
+footer{text-align:center;border-top:1px solid #ffffff12;padding:28px;color:#64748b;font-size:11px}
+@media(max-width:760px){.workspace{grid-template-columns:1fr}.hero{padding-top:55px}.info{grid-template-columns:1fr}.panel{padding:19px}nav{padding:0 5%}.hero h1{letter-spacing:-1.5px}}
+</style>
+</head>
+<body>
+<nav>
+<div class="logo">HUMAN<span>.AI</span></div>
+<div class="navright"><span class="dot"></span> AI SYSTEM ONLINE</div>
+</nav>
+
+<section class="hero">
+<div class="tag">✦ DEEP LEARNING POWERED</div>
+<h1>Understand Human<br><span class="gradient">Activity with AI.</span></h1>
+<p>Upload a photo, capture an image, and let our intelligent deep learning model recognize human activities in seconds.</p>
+</section>
+
+<main class="container">
+<div class="workspace">
+<section class="panel">
+<div class="panelhead">
+<h2>⚡ Activity Scanner</h2>
+<span class="small">IMAGE ANALYSIS</span>
+</div>
+
+<div class="tabs">
+<button class="active" id="uploadTab" onclick="showTab('upload')">▧ Upload Image</button>
+<button id="cameraTab" onclick="showTab('camera')">◎ Webcam Capture</button>
+</div>
+
+<div id="uploadArea">
+<div class="dropzone" id="dropzone" onclick="document.getElementById('imageInput').click()">
+<div class="uploadicon">📤</div>
+<h3>Drop your image here</h3>
+<p>or <span class="browse">browse files</span> from your device<br>JPG, JPEG or PNG supported</p>
+</div>
+<input type="file" id="imageInput" accept="image/png,image/jpeg">
+</div>
+
+<div id="cameraArea" style="display:none">
+<div class="dropzone" id="cameraPlaceholder">
+<div class="uploadicon">📷</div>
+<h3>Ready to capture?</h3>
+<p>Start your camera and take a still photo<br>to analyze human activity.</p>
+</div>
+<video id="video" autoplay playsinline></video>
+<canvas id="canvas" style="display:none"></canvas>
+<div class="cameraBtns">
+<button class="action" onclick="startCamera()">Start Camera</button>
+<button class="action" onclick="capturePhoto()">Capture Photo</button>
+</div>
+</div>
+
+<div class="previewwrap" id="previewWrap">
+<img id="preview" alt="Selected image preview">
+<button class="remove" onclick="removeImage()">✕</button>
+</div>
+
+<button class="predict" id="predictBtn" onclick="predictActivity()">✦ &nbsp; ANALYZE ACTIVITY</button>
+<p class="status" id="status">Waiting for an image...</p>
+</section>
+
+<section class="panel resultpanel">
+<div>
+<div class="resulttop">
+<h2>✧ AI Prediction</h2>
+<span class="live">● READY</span>
+</div>
+<div class="resultbox">
+<div class="resulticon" id="resultIcon">🧠</div>
+<p class="resultlabel">RECOGNIZED ACTIVITY</p>
+<h3 id="activity">AWAITING INPUT</h3>
+<p class="emptyhint" id="confidence">Your prediction will appear here after image analysis.</p>
+<div class="confbar"><div id="bar"></div></div>
+</div>
+</div>
+<div class="resultbottom">
+<div class="mini"><strong id="score">--</strong><span>CONFIDENCE SCORE</span></div>
+<div class="mini"><strong id="modelStatus">READY</strong><span>MODEL STATUS</span></div>
+</div>
+</section>
+</div>
+
+<section class="panel activities">
+<h2>✦ Supported Activities</h2>
+<div class="chips">
+<span class="chip">🚶 Walking</span>
+<span class="chip">🏃 Running</span>
+<span class="chip">🪑 Sitting</span>
+<span class="chip">🧍 Standing</span>
+<span class="chip">🛌 Lying</span>
+<span class="chip">🤸 Jumping</span>
+<span class="chip">↘ Bending</span>
+<span class="chip">⬇ Squatting</span>
+<span class="chip">🙆 Stretching</span>
+</div>
+</section>
+
+<div class="info">
+<div class="infocard"><div class="infoicon">🧠</div><b>Deep Learning Model</b><p>Powered by MobileNetV2 transfer learning for image-based activity classification.</p></div>
+<div class="infocard"><div class="infoicon">⚡</div><b>Instant Prediction</b><p>Upload an image and receive a predicted activity with a confidence score.</p></div>
+<div class="infocard"><div class="infoicon">🔒</div><b>Simple & Easy</b><p>Use image upload or capture a still photo with your webcam.</p></div>
+</div>
+</main>
+
+<footer>HUMAN.AI &nbsp; | &nbsp; Human Activity Recognition System &nbsp; | &nbsp; Deep Learning Project</footer>
+
+<script>
+const API_URL="https://sequester-passive-kissing.ngrok-free.dev";
+let selectedFile=null,stream=null;
+
+const $=id=>document.getElementById(id);
+
+function showTab(tab){
+$("uploadArea").style.display=tab==="upload"?"block":"none";
+$("cameraArea").style.display=tab==="camera"?"block":"none";
+$("uploadTab").classList.toggle("active",tab==="upload");
+$("cameraTab").classList.toggle("active",tab==="camera");
+}
+
+function setImage(file){
+if(!file||!file.type.startsWith("image/")){ $("status").textContent="Please select a valid image.";return;}
+selectedFile=file;
+$("preview").src=URL.createObjectURL(file);
+$("previewWrap").style.display="block";
+$("dropzone").style.display="none";
+$("cameraPlaceholder").style.display="none";
+$("video").style.display="none";
+$("status").textContent="Image loaded successfully. Ready to analyze.";
+resetResult();
+}
+
+$("imageInput").addEventListener("change",e=>setImage(e.target.files[0]));
+
+$("dropzone").addEventListener("dragover",e=>{e.preventDefault();$("dropzone").classList.add("drag");});
+$("dropzone").addEventListener("dragleave",()=>$("dropzone").classList.remove("drag"));
+$("dropzone").addEventListener("drop",e=>{
+e.preventDefault();$("dropzone").classList.remove("drag");setImage(e.dataTransfer.files[0]);
+});
+
+function removeImage(){
+selectedFile=null;
+$("previewWrap").style.display="none";
+$("dropzone").style.display="flex";
+$("cameraPlaceholder").style.display="flex";
+$("imageInput").value="";
+$("status").textContent="Waiting for an image...";
+resetResult();
+}
+
+function resetResult(){
+$("activity").textContent="AWAITING INPUT";
+$("confidence").textContent="Your prediction will appear here after image analysis.";
+$("score").textContent="--";
+$("bar").style.width="0";
+$("resultIcon").textContent="🧠";
+$("modelStatus").textContent="READY";
+}
+
+async function startCamera(){
+try{
+if(stream)stream.getTracks().forEach(t=>t.stop());
+stream=await navigator.mediaDevices.getUserMedia({video:true});
+$("video").srcObject=stream;
+$("video").style.display="block";
+$("cameraPlaceholder").style.display="none";
+$("status").textContent="Camera started. Capture a photo when ready.";
+}catch(e){$("status").textContent="Camera error: "+e.message;}
+}
+
+function capturePhoto(){
+if(!$("video").videoWidth){$("status").textContent="Please start the camera first.";return;}
+let canvas=$("canvas"),video=$("video");
+canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+canvas.getContext("2d").drawImage(video,0,0);
+canvas.toBlob(blob=>{
+setImage(new File([blob],"webcam-photo.jpg",{type:"image/jpeg"}));
+if(stream)stream.getTracks().forEach(t=>t.stop());
+stream=null;
+},"image/jpeg");
+}
+
+async function predictActivity(){
+if(!selectedFile){$("status").textContent="Please upload or capture an image first.";return;}
+$("predictBtn").disabled=true;
+$("predictBtn").textContent="ANALYZING IMAGE...";
+$("status").textContent="AI is analyzing your image...";
+$("modelStatus").textContent="WORKING";
+
+try{
+const formData=new FormData();
+formData.append("image",selectedFile);
+const response=await fetch(API_URL+"/predict",{method:"POST",body:formData});
+const data=await response.json();
+if(!response.ok)throw new Error(data.error||"Prediction failed");
+
+$("activity").textContent=data.activity;
+$("confidence").textContent="Model confidence: "+data.confidence+"%";
+$("score").textContent=data.confidence+"%";
+$("bar").style.width=Math.min(100,Math.max(0,data.confidence))+"%";
+$("modelStatus").textContent="SUCCESS";
+$("resultIcon").textContent="✨";
+$("status").textContent="Prediction completed successfully!";
+}catch(e){
+$("status").textContent="Error: "+e.message+". Check that Colab and ngrok are running.";
+$("modelStatus").textContent="ERROR";
+}finally{
+$("predictBtn").disabled=false;
+$("predictBtn").innerHTML="✦ &nbsp; ANALYZE ACTIVITY";
+}
+}
+</script>
+</body>
+</html>
